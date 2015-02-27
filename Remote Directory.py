@@ -9,7 +9,7 @@ class putCommand(sublime_plugin.EventListener):
 	def on_post_save(self, view):
 		settings = sublime.load_settings("Remote Directory.sublime-settings")
 		#If project settings are defined, use them, otherwise, use the package settings, otherwise, default
-		local_path_mask = sublime.active_window().active_view().settings().get("local_path_mask", settings.get("local_path_mask", "/Users/justinashleylawii/Code/github/justinashleylawii/miniature-cyril/Railo"))
+		local_path_mask = sublime.active_window().active_view().settings().get("local_path_mask", settings.get("local_path_mask", ""))
 		local_file_path = os.path.split(view.file_name())
 		local_file_index = local_file_path[0].find(local_path_mask)
 
@@ -20,7 +20,7 @@ class putCommand(sublime_plugin.EventListener):
 		
 		local_file_index += len(local_path_mask)
 
-		remote_path_mask = sublime.active_window().active_view().settings().get("remote_path_mask", settings.get("remote_path_mask", "/Users/justinashleylawii/Documents/Railo/webapps/ROOT"))
+		remote_path_mask = sublime.active_window().active_view().settings().get("remote_path_mask", settings.get("remote_path_mask", ""))
 		remote_file_path = remote_path_mask + view.file_name()[local_file_index:]
 
 		#sublime.message_dialog(remote_file_path)
@@ -79,10 +79,6 @@ class putCommand(sublime_plugin.EventListener):
 
 								#Get the last time the local file was modified
 								local_lastModified = os.stat(view.file_name()).st_mtime
-
-								#Launch winmerge with the two versions
-								check_call(["C:\Program Files (x86)\WinMerge\WinMergeU", "/wr", "/dl", "Local File", "/dr", "Remote File", view.file_name(), remote_file_path], shell=False)
-								
 
 								#Now we need to perform the put anyways
 								if local_lastModified < os.stat(view.file_name()).st_mtime:
@@ -143,8 +139,8 @@ class getCommand(sublime_plugin.TextCommand):
 class get_fileCommand(sublime_plugin.WindowCommand):
 	def run_(self, f):
 		settings = sublime.load_settings("Remote Directory.sublime-settings")
-		#Example base directory. Real would be C:\Users\jalaw\Documents\local\intranet\
-		local_path_mask = sublime.active_window().active_view().settings().get("local_path_mask", settings.get("local_path_mask", "/Users/justinashleylawii/Dropbox/miniature-cyril/Railo"))
+		#Example base directory. Real would be C:\Users\username\Documents\programs\
+		local_path_mask = sublime.active_window().active_view().settings().get("local_path_mask", settings.get("local_path_mask", ""))
 		local_file_path = os.path.split(f)
 		local_file_index = local_file_path[0].find(local_path_mask)
 
@@ -154,7 +150,7 @@ class get_fileCommand(sublime_plugin.WindowCommand):
 	
 		local_file_index += len(local_path_mask)
 
-		remote_path_mask = sublime.active_window().active_view().settings().get("remote_path_mask", settings.get("remote_path_mask", "/Users/justinashleylawii/Documents/Railo/webapps/ROOT"))
+		remote_path_mask = sublime.active_window().active_view().settings().get("remote_path_mask", settings.get("remote_path_mask", ""))
 		remote_file_path = remote_path_mask + f[local_file_index:]
 
 		#sublime.message_dialog(remote_file_path)
@@ -212,47 +208,12 @@ class get_filesCommand(sublime_plugin.WindowCommand):
 	def is_visible(self, files):
 		return len(files) > 0
 
-class diffCommand(sublime_plugin.TextCommand):
-	def run_(self, args):
-		self.view.window().run_command("diff_file", self.view.file_name())
-
-class diff_fileCommand(sublime_plugin.WindowCommand):
-	def run_(self, f):
-		settings = sublime.load_settings("Remote Directory.sublime-settings")
-		#Example base directory. Real would be C:\Users\jalaw\Documents\local\intranet\
-		local_path_mask = sublime.active_window().active_view().settings().get("local_path_mask", settings.get("local_path_mask", "/Users/justinashleylawii/Dropbox/miniature-cyril/Railo"))
-		remote_path_mask = sublime.active_window().active_view().settings().get("remote_path_mask", settings.get("remote_path_mask", "/Users/justinashleylawii/Documents/Railo/webapps/ROOT"))
-
-		local_file_path = os.path.split(f)
-		local_file_index = local_file_path[0].find(local_path_mask)
-
-		if local_file_index == -1:
-			sublime.message_dialog("The local_path_mask(" + local_path_mask + ") is invalid for the current file. Diff operation aborted.")
-			return
-	
-		local_file_index += len(local_path_mask)
-		remote_file_path = remote_path_mask + f[local_file_index:]
-
-		check_call(["C:\Program Files (x86)\WinMerge\WinMergeU", "/wr", "/dl", "Local File", "/dr", "Remote File", f, remote_file_path], shell=False)
-
-		return
-
-	def is_visible(self, files):
-		return len(files) > 0
-
-class diff_filesCommand(sublime_plugin.WindowCommand):
-	def run(self, files):
-		for f in files:
-			self.window.run_command("diff_file", f)
-
-		return
-
 class get_dirsCommand(sublime_plugin.WindowCommand):
 	def run(self, dirs):
 		settings = sublime.load_settings("Remote Directory.sublime-settings")
 
-		local_path_mask = sublime.active_window().active_view().settings().get("local_path_mask", settings.get("local_path_mask", "/Users/justinashleylawii/Dropbox/miniature-cyril/Railo"))
-		remote_path_mask = sublime.active_window().active_view().settings().get("remote_path_mask", settings.get("remote_path_mask", "/Users/justinashleylawii/Documents/Railo/webapps/ROOT"))
+		local_path_mask = sublime.active_window().active_view().settings().get("local_path_mask", settings.get("local_path_mask", ""))
+		remote_path_mask = sublime.active_window().active_view().settings().get("remote_path_mask", settings.get("remote_path_mask", ""))
 
 		for d in dirs:
 			local_file_path = d
