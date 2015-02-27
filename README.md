@@ -102,6 +102,14 @@ If the operation was successful, a message will be printed in the console (ctrl+
 
 Remote-directory keeps track of gets and puts using a file created in the local directory of any file being retrieved. This file is named sublime_gethistory.txt. You should exclude this file from stuff like git and whatever, but it'll probably be ok if you forget.
 
+You can change the name of the history file by modifying the following line in the *Remote Directory.sublime-settings* file:
+
+```
+"history_file_name":"sublime_gethistory.txt"
+```
+
+Just change sublime_gethistory.txt to whatever you want. It doesn't need to be a txt file.
+
 ##Notes
 
 I've run this plugin on Mac OSX, Windows 8, and Linux (CentOS), and I've used it to write files to Dropbox folders, file shares, and other directories on my computer. That being said, I know there are bugs. There may even be some bad ones. If you find one, create an issue for it and I'll fix it.
