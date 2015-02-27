@@ -1,0 +1,7 @@
+[
+	{ "caption": "-" },
+	{ "caption": "Get remote file", "command": "get_files", "args": {"files": []} },
+	{ "caption": "Get remote directory", "command": "get_dirs", "args": {"dirs": []} },
+	{ "caption": "Compare with Remote", "command": "diff_files", "args": {"files": []}},
+	{ "caption": "-" }
+]

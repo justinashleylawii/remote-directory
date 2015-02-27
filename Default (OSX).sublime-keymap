@@ -1,0 +1,4 @@
+[
+	{"keys": ["ctrl+command+x"], "command": "get"},
+	{"keys": ["ctrl+command+c"], "command": "put"}
+]
