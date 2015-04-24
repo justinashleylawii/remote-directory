@@ -3,14 +3,8 @@
         "caption": "Remote Directory: Get remote file",
         "command": "get"
     },
-
     {
-        "caption": "Remote Directory: Put remote file",
+        "caption": "Remote Directory: Put local file",
         "command": "save"
-    },
-    {
-    	"caption": "Remote Directory: Compare remote file",
-    	"command": "diff"
     }
-
 ]

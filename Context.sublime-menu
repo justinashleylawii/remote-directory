@@ -1,6 +1,5 @@
 [
 	{ "caption": "-" },
 	{ "caption": "Get remote file", "command": "get" },
-	{ "caption": "Put remote file", "command": "save"},
-	{ "caption": "Compare with remote", "command": "diff"}
+	{ "caption": "Put local file", "command": "save"}
 ]

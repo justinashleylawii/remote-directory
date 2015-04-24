@@ -1,5 +1,10 @@
 {
-	"history_file_name":"sublime_gethistory.txt",
-	"local_path_mask":"your_local_path_mask_here",
-	"remote_path_mask":"your_remote_path_mask_here"
+	"remote_directory":
+	{
+		"local_mask": "local_mask_here",
+		"remote_mask": "remote_mask_here",
+		"history_file": "sublime_gethistory.txt",
+		"exclude_extensions": [],
+		"exclude_directories": []
+	}
 }
