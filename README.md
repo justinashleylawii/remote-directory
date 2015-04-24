@@ -1,115 +1,78 @@
-# remote-directory
+# Remote Directory
 
-Remote-Directory is a Sublime Text 2 plugin which allows you to save a file in a second location whenever you use the save command. Basically, let's say that you have a directory where you like to write all of your programs, but in this case, the program you're writing happens to be a web application which you need to run from within wwwroot or something. Once set up, remote-directory will, when you save a file to your documents folder (or wherever you keep your code), save the file in the appropriate place in the wwwroot as well. Note that even though it's called remote directory, the file needs to be part of your filesystem. This is not an FTP front-end.
+Remote Directory is a Sublime Text 2/3 plugin which allows you to keep a project in two locations at the same time. The general use-case here is when you have a working directory, and another directory where files need to be placed into in order to work (think webroot when developing for the web). Typically this is done through FTP or some other networked system, but when you're working on a personal project or something smaller scale, FTP can be overkill. Particularly if the drive you're developing on is the same machine as your webserver. Another use-case is when you want to keep something stored in Dropbox, but you don't want to actually develop it in your Dropbox folder. It's important to note that Remote Directory only works with files accessible through your local machine; this isn't an FTP client. 
 
-When saving a file to a shared directory, where someone else might modify the file, your work is at risk of being overwritten (obviously if you're not a scrub, then you're using version control (ever heard of git?), and this senario doesn't hold). Remote-directory compensates for this by keeping track of the last time you retrieved a copy of the remote file. If you try and save a file which has been modified since the last time you retrieved it, Sublime will yell at you and refuse to do it.
+##How it Works
 
-##Setup
+Let's say that you want to keep all your development files organized in a subdirectory of your documents folder, and that you need these files to be copied into your webroot whenever you save them in Sublime. For the purpose of this demonstration, lets say that these are the two directories:
 
-Once you've installed the remote-directory plugin to Sublime, if you want it to actually do anything, you need to tell it where you want files to go. Currently, these settings are on a per-project basis. (I think this also works with the regular settings file if you don't create projects)
+``C:\Users\Steve\Documents\Sweet Program\``
+``C:\Railo\webroot\Sweet Program\``
 
-Once you have a project opened in Sublime, you can access the project settings by going to Project->Edit Project in the toolbar at the top. Sublime will open your project specific .sublime-project file.
+In Remote Directory, the first path is referred to as the **local path**, and the second is referred to as the **remote path** (pretty easy right?). So when you save a file in Sublime, if it is in the local path (or a subdirectory thereof), Remote Directory will attempt to copy the file to the corresponding location in the remote path. Remote Directory will create any subdirectories or files necessary to do this.
 
-If you're unfamiliar with Sublime's different configuration files, they're essentially JSON files which contain a series of structures, arrays, keys, and values which are interpreted by Sublime and its plugins to change the way it operates. Add the following to your project settings file:
+What happens if someone (or something) else modifies the file since the last time that you sent it to the remote (put)? Well, without intervention, it would be overwritten, which may or may not be a problem. To deal with this Remote Directory keeps track of the last time that you copied the remote file to your local path (get). If the remote file has been modified since the last time that you did this, then it will refuse to ``put`` the file until you perform the ``get`` operation. This prevents you from overwritting something you might have preferred to keep.
 
-```javascript
+##Installation & Setup
+
+To install Remote Directory, download the zip file and extract it into your Packages folder.
+
+Once Remote Directory is installed, you'll really need to set up settings in each Sublime project you want to use it with. For each project you want to use Remote Directory with, you'll need to add the following settings to your Project. You can change your project specific settings by using ``Project -> Edit Project``.
+
+```
+
 "settings":
 {
-	"local_path_mask":"your local path goes here",
-	"remote_path_mask":"your remote path goes here"
+	"remote_directory":
+	{
+		"local_mask": "C:\\Users\\Steve\\Documents\\Sweet Program\\",
+		"remote_mask": "C:\\Railo\\webroot\\Sweet Program\\",
+		"history_file": "sublime_gethistory.txt",
+		"exclude_extensions": [".txt", ".dll"],
+		"exclude_directories": [".git"],
+		"debug": "False"
+	}
 }
+
 ```
 
-Change "your local path goes here" to values which correspond to your environment.
+The only required settings of those above are the two masks (local_mask and remote_mask). Everything else is included for completeness, but Remote Directory will work without them. Also, note that the settings provided above are purely for demonstration purposes and as such it's strongly recommended that you change your settings to values appropriate to you. But we're all programmers here, I'm sure that you knew that =]
 
-###Path Masks
+###Settings
 
-First, I have to tell you something which you've probably already noticed if you're reading this: This plugin isn't polished at all. It's not user friendly, and there are some things that really suck about it. I made this for my own use, but figured other people might be able to benefit from it. I will fix some of these things if there's ever a demand for it, but until then just think of it as being in alpha.. or something.
+* ``local_mask`` - The local path. Make sure to escape all backslashes since this is a JSON string.
+* ``remote_mask`` - The remote path. Make sure to escape all backslashes here as well.
+* ``history_file`` - The name of the history file, which keeps track of the last time you used the ``get`` command on a remote file. You can change this to whatever you want, but if you change it, make sure you change the names of any generated history files so that Remote Directory knows where to look.
+* ``excluded_extensions`` - An array of file extensions to ignore. Remote Directory just looks at the end of a file to see if it contains the extension. You can use this to ignore a specific filename as well, since it really just compares the filename to each of the strings in this array.
+* ``excluded_directories`` - An array of paths, or directory names. If the path of the file contains anything in this array, the operation will abort. This means you can specify partial paths or a specific folder name (as in the example above), but it also means that it's pretty easy to accidentally exclude something you're trying not to exclude.
+* ``debug`` - Defaults to False. Used to decide whether debug output should be sent to the console. If you're not sure whether something is working properly, you might be able to troubleshoot it using this option. If it's set to False, then nothing will be sent to the console.
 
-Anyway, path masks are remote-directory's way of deciding what should be moved to the remote directory, and to what remote-directory it should be moved.
+Again, only the local_mask and remote_mask are required.
 
-####Local Path Mask
-
-A local path mask might look like:
-```
-C:\\Users\\yourname\\Documents\\program\\yourproject
-```
-
-Note the double backspaces are just regular backspaces being escaped, so the actual path is:
-```
-C:\Users\yourname\Documents\program\yourproject
-```
-
-This means that any file you save in 
-```
-C:\Users\yourname\Documents\program\yourproject
-```
-or **any of its subdirectories** will be saved using remote-directory.
-
-####Remote Path Mask
-
-Likewise, the remote path mask might look like: 
-```
-\\\\sharedDrive\\webserver\\wwwroot\\yourproject
-```
-When you save the file *test.txt* in:
-```
-C:\Users\yourname\Documents\program\yourproject
-```
-remote-directory will attempt to save the file:
-```
-\\\\sharedDrive\\webserver\\wwwroot\\yourproject\\test.txt
-```
-
-
-Additionally, if you save a file in: 
-```
-C:\\Users\\yourname\\Documents\\program\\yourproject\\subdirectory
-```
-remote-directory will try to save:
-```
-\\\\sharedDrive\\webserver\\wwwroot\\yourproject\\subdirectory\\test.txt
-```
-
-###Caveats
-
-Currently, remote-directory won't create any folders. So in the above example, "subdirectory" needs to already exist. Otherwise, it does nothing. Also, if the remote file already exists, it will only be overwritten if the remote file has been retrieved more recently than it has been written. More on that in the *Usage* section. If a file is outside of the local path mask, nothing happens. Which is good, so that random files on your computer aren't being replicated elsewhere on your computer unless you set up your masks to allow that.
 
 ##Usage
 
-Using remote-directory is fairly simple. The main actions are **GET** and **PUT**.
+Using Remote Directory is fairly simple. The main actions are ``get`` and ``put``.
 
 ###Get
 
-You can get the remote version of a local file in one of several ways.  
+You can get the remote version of a local file in one of several ways:
  1. With the local file open in the current buffer, right click and select **Get remote file** from the context menu. This will get the contents of the corresponding remote file and put them in the currently open buffer.
  2. Right click on a file or directory in the side bar and select **Get remote Directory** (or file).
- 3. Use the command pallet and select **Remote Directory: Get remote file**
+ 3. Use the command palette and select **Remote Directory: Get remote file**
  4. Using a keyboard shortcut. By default this is (ctrl+alt+x)
  
-Once a file is retrieved using the Get command, you can perform a Put.
+Once a file is retrieved using the ``get`` command, you can use the ``put`` command.
 
 ###Put
 
-You can write the local version of a file to the corresponding remote directory in one of several ways.  
- 1. With the local file open in the current buffer, right click and select **Put remote file** from the context menu.
- 2. Use the command pallet and select **Remote Directory: Put remote file**
- 3. Save the file using any normal means (File->Save, command pallet, etc)
- 
-If the operation was successful, a message will be printed in the console (ctrl+` on Windows).
+You can write the local version of a file to the corresponding remote directory in one of several ways.: 
+ 1. With the local file open in the current buffer, right click and select **Put local file** from the context menu.
+ 2. Use the command pallet and select **Remote Directory: Put local file**
+ 3. Save the file using any normal means (File->Save, command palette, etc)
+ 4. Right click on a file or directory in the side bar and select **Put local directory** (or file).
+
 
 ###History files
 
-Remote-directory keeps track of gets and puts using a file created in the local directory of any file being retrieved. This file is named sublime_gethistory.txt. You should exclude this file from stuff like git and whatever, but it'll probably be ok if you forget.
-
-You can change the name of the history file by modifying the following line in the *Remote Directory.sublime-settings* file:
-
-```
-"history_file_name":"sublime_gethistory.txt"
-```
-
-Just change sublime_gethistory.txt to whatever you want. It doesn't need to be a txt file.
-
-##Notes
-
-I've run this plugin on Mac OSX, Windows 8, and Linux (CentOS), and I've used it to write files to Dropbox folders, file shares, and other directories on my computer. That being said, I know there are bugs. There may even be some bad ones. If you find one, create an issue for it and I'll fix it.
+Remote Directory keeps track of ``gets`` using a file created in the local directory of any file being retrieved. By default, this file is named sublime_gethistory.txt. You should make sure to exclude this file from stuff like git and whatever, but it'll probably be ok if you forget. You can change the name of the history file by modifying your settings (either by project of using the global plugin settings). The history file doesn't need to have an extension.
