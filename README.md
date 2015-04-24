@@ -7,6 +7,7 @@ Remote Directory is a Sublime Text 2/3 plugin which allows you to keep a project
 Let's say that you want to keep all your development files organized in a subdirectory of your documents folder, and that you need these files to be copied into your webroot whenever you save them in Sublime. For the purpose of this demonstration, lets say that these are the two directories:
 
 ``C:\Users\Steve\Documents\Sweet Program\``
+
 ``C:\Railo\webroot\Sweet Program\``
 
 In Remote Directory, the first path is referred to as the **local path**, and the second is referred to as the **remote path** (pretty easy right?). So when you save a file in Sublime, if it is in the local path (or a subdirectory thereof), Remote Directory will attempt to copy the file to the corresponding location in the remote path. Remote Directory will create any subdirectories or files necessary to do this.
