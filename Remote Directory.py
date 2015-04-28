@@ -2,6 +2,7 @@ import sublime, sublime_plugin
 import os
 import fileinput
 import shutil
+import functools
 
 class Settings():
 
@@ -148,9 +149,8 @@ class RemoteDirectory():
 				self.print_message("get_file: File '" + remote_file_path[1] + "' not found. Aborting.")
 				return
 
-			# Get the file and reload in Sublime
+			# Get the file
 			shutil.copy2(remote_file, local_file)
-			sublime.active_window().active_view().run_command('revert')
 
 			# Update the history file
 			history.update_history(local_file_path[1], last_modified)
@@ -276,6 +276,13 @@ class RemoteDirectory():
 		if self.settings.get("debug"):
 			print(message)
 
+	def is_done_loading(self, view):
+
+		if view.is_loading():
+			sublime.set_timeout(self.is_done_loading(view), 500)
+			print("Still loading")
+		return
+
 class getCommand(sublime_plugin.TextCommand):
 	def run(self, edit):
 
@@ -286,6 +293,9 @@ class getCommand(sublime_plugin.TextCommand):
 
 		if remote_file != -1:
 			rd.get_file(remote_file)
+
+			# Revert
+			sublime.set_timeout(functools.partial(self.view.run_command, "revert"), 0)
 
 class put(sublime_plugin.EventListener):
 	def on_post_save(self, view):
