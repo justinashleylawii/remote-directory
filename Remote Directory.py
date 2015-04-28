@@ -276,13 +276,6 @@ class RemoteDirectory():
 		if self.settings.get("debug"):
 			print(message)
 
-	def is_done_loading(self, view):
-
-		if view.is_loading():
-			sublime.set_timeout(self.is_done_loading(view), 500)
-			print("Still loading")
-		return
-
 class getCommand(sublime_plugin.TextCommand):
 	def run(self, edit):
 
